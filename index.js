@@ -23,6 +23,7 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static('dist'));
 
 const requestLogger = (request, response, next) => {
     console.log("Method: ", request.method);
@@ -50,6 +51,22 @@ app.get('/api/notes/:id', (request, response) => {
     } else {
         response.status(404).end();
     }
+});
+
+app.put('/api/notes/:id', (request, response) => {
+    const id = Number(request.params.id);
+    const body = request.body;
+    if (!body.content) {
+        return response.status(400).json({error: 'content missing'});
+    }
+
+    const note = {
+        id: body.id,
+        content: body.content,
+        important: Boolean(body.important) || false
+    }
+    notes = notes.map(x => x.id !== id ? x : note);
+    response.json(note);
 });
 
 app.delete('/api/notes/:id', (request, response) => {
